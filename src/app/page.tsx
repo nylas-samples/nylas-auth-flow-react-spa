@@ -1,5 +1,6 @@
 'use client'
 
+import "dotenv/config";
 import Image from "next/image";
 import { useState, useReducer, useEffect } from "react";
 import { NylasSessions, useNylasSessions } from "@nylas/identity";
@@ -13,19 +14,19 @@ export default function Home() {
 
   useEffect(() => {
     const session = new NylasSessions({
-      clientId: "<NYLAS_CLIENT_ID>",
-      redirectUri:	"http://localhost:3000",
+      clientId: process.env.NEXT_PUBLIC_NYLAS_CLIENT_ID,
+      redirectUri: process.env.NEXT_PUBLIC_NYLAS_CALLBACK_URI,
       hosted: true,
-      domain: "https://api.us.nylas.com/v3",
+      domain: process.env.NEXT_PUBLIC_NYLAS_API_URI,
     });
 
-    // TODO: Try to remove function some state
+    // TODO: Try to remove function from state
     setSession(session);
     
     const getAuthLink = async () => {
       const link = await session.auth({
         provider: "google",
-        loginHint: "<EMAIL>",
+        loginHint: process.env.NEXT_PUBLIC_EMAIL_TO_AUTHENTICATE,
       }) as string;
       setAuthUrl(link);
     }
@@ -65,13 +66,13 @@ export default function Home() {
   };
 
   const disconnectUser = () => {
-    // TODO: Try to remove function some state
+    // TODO: Try to remove function from state
     session?.logout();
 
     localStorage.clear();
     setGrantId(null);
 
-    // TODO: Need to find workaround to reset session, PKCE value
+    // TODO: Need to find workaround to reset session, PKCE value in local storage
     location.reload();
   }
 
